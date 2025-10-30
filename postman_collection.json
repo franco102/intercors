@@ -2,10 +2,79 @@
   "info": {
     "_postman_id": "matrix-rotation-api",
     "name": "Matrix Rotation API",
-    "description": "Collection for testing Matrix Rotation and Statistics APIs",
+    "description": "Collection for testing Matrix Rotation and Statistics APIs with JWT Authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "nodeUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Obtener token de autenticación"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.token);",
+                  "pm.test(\"Token recibido\", function() {",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Health Checks",
       "item": [
@@ -15,10 +84,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/health",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
               "path": ["health"]
             }
           }
@@ -29,10 +96,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/health",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
+              "raw": "{{nodeUrl}}/health",
+              "host": ["{{nodeUrl}}"],
               "path": ["health"]
             }
           }
@@ -43,118 +108,29 @@
       "name": "Matrix Rotation",
       "item": [
         {
-          "name": "Simple 3x3 Matrix",
+          "name": "Rotate Matrix (Requires Auth)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n  ]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Diagonal Matrix",
-          "request": {
-            "method": "POST",
-            "header": [
+              },
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [5, 0, 0],\n    [0, 5, 0],\n    [0, 0, 5]\n  ]\n}"
+              "raw": "{\n    \"data\": [\n        [1, 2, 3],\n        [4, 5, 6],\n        [7, 8, 9]\n    ]\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{baseUrl}}/api/rotate",
+              "host": ["{{baseUrl}}"],
               "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Rectangular Matrix",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [1, 2, 3, 4],\n    [5, 6, 7, 8]\n  ]\n}"
             },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Matrix with Negative Numbers",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [-1, -2, -3],\n    [-4, -5, -6],\n    [-7, -8, -9]\n  ]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Large Matrix",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [1, 2, 3, 4, 5],\n    [6, 7, 8, 9, 10],\n    [11, 12, 13, 14, 15],\n    [16, 17, 18, 19, 20],\n    [21, 22, 23, 24, 25]\n  ]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
+            "description": "Rotate a matrix 90 degrees clockwise (requires authentication)"
           }
         }
       ]
@@ -163,26 +139,29 @@
       "name": "Statistics",
       "item": [
         {
-          "name": "Calculate Statistics",
+          "name": "Calculate Statistics (Requires Auth)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"data\": [\n    [7, 4, 1],\n    [8, 5, 2],\n    [9, 6, 3]\n  ]\n}"
+              "raw": "{\n    \"data\": [\n        [7, 4, 1],\n        [8, 5, 2],\n        [9, 6, 3]\n    ]\n}"
             },
             "url": {
-              "raw": "http://localhost:3000/api/statistics",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
+              "raw": "{{nodeUrl}}/api/statistics",
+              "host": ["{{nodeUrl}}"],
               "path": ["api", "statistics"]
-            }
+            },
+            "description": "Calculate statistics for a matrix (requires authentication)"
           }
         }
       ]
@@ -191,7 +170,7 @@
       "name": "Error Cases",
       "item": [
         {
-          "name": "Empty Matrix",
+          "name": "Unauthorized Request",
           "request": {
             "method": "POST",
             "header": [
@@ -202,61 +181,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"data\": []\n}"
+              "raw": "{\n    \"data\": [\n        [1, 2, 3],\n        [4, 5, 6],\n        [7, 8, 9]\n    ]\n}"
             },
             "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
+              "raw": "{{baseUrl}}/api/rotate",
+              "host": ["{{baseUrl}}"],
               "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Invalid JSON",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{ invalid json }"
             },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
-          }
-        },
-        {
-          "name": "Missing Data Field",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"matrix\": [[1, 2], [3, 4]]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/rotate",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "8080",
-              "path": ["api", "rotate"]
-            }
+            "description": "This request should fail with 401 Unauthorized"
           }
         }
       ]
