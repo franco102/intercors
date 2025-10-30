@@ -269,6 +269,41 @@ fetch('http://localhost:8080/api/rotate', {
 └── README.md               # Este archivo
 ```
 
+## Configuración de Variables de Entorno
+
+### Archivo `go-api/.env`
+```env
+# Puerto en el que se ejecutará el servidor Go
+PORT=8080
+
+# URL de la API de Node.js
+NODE_API_URL=http://node-api:3000
+
+# Clave secreta para JWT (debe ser la misma en ambos servicios)
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+
+# Copiar el archivo .env.example y renombrarlo .env
+```
+
+### Archivo `node-api/.env`
+```env
+# Puerto en el que se ejecutará el servidor Node.js
+PORT=3000
+
+# Clave secreta para JWT (debe ser la misma en ambos servicios)
+JWT_SECRET=tu_clave_secreta_muy_segura_aqui
+
+# Entorno (development, production)
+NODE_ENV=development
+#Copiar el archivo .env.example y renombrarlo .env
+
+```
+
+### Notas importantes:
+1. Ambos servicios deben usar el mismo valor para `JWT_SECRET`
+2. Los archivos `.env` deben ser agregados a `.gitignore`
+3. Para producción, usa variables de entorno del sistema o un gestor de secretos
+
 ## Consideraciones Técnicas
 
 - **Lenguajes**: Go para la API de rotación, Node.js/Express para estadísticas
