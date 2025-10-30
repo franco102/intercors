@@ -29,16 +29,7 @@ func NewNodeAPIService() *NodeAPIService {
 	}
 }
 
-func (s *NodeAPIService) authenticate() (string, error) {
-	username := os.Getenv("NODE_API_USERNAME")
-	password := os.Getenv("NODE_API_PASSWORD")
-
-	if username == "" {
-		username = "admin"
-	}
-	if password == "" {
-		password = "password"
-	}
+func (s *NodeAPIService) authenticate(username, password string) (string, error) {
 
 	payload := map[string]string{
 		"username": username,
@@ -69,8 +60,9 @@ func (s *NodeAPIService) authenticate() (string, error) {
 	return tokenResp.Token, nil
 }
 
-func (s *NodeAPIService) SendRotatedMatrix(rotatedMatrix [][]int, originalDiagonal bool) (map[string]interface{}, error) {
-	token, err := s.authenticate()
+func (s *NodeAPIService) SendRotatedMatrix(rotatedMatrix [][]int, originalDiagonal bool, username, password string) (map[string]interface{}, error) {
+
+	token, err := s.authenticate(username, password)
 	if err != nil {
 		return nil, err
 	}

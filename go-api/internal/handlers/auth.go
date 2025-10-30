@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"os"
+	"sync"
+
 	"github.com/franco102/intercors/go-api/internal/models"
 	"github.com/franco102/intercors/go-api/internal/utils"
 
@@ -8,14 +11,24 @@ import (
 )
 
 type AuthHandler struct {
-	jwtSecret []byte
+	jwtSecret       []byte
+	userCredentials sync.Map
 }
 
 func NewAuthHandler() *AuthHandler {
-	secret := []byte("your-secret-key-change-in-production")
+	secret := []byte(os.Getenv("KEY_JWT"))
 	return &AuthHandler{
 		jwtSecret: secret,
 	}
+}
+func (h *AuthHandler) StoreCredentials(username, password string) {
+	h.userCredentials.Store(username, password)
+}
+func (h *AuthHandler) GetCredentials(username string) (string, bool) {
+	if password, ok := h.userCredentials.Load(username); ok {
+		return password.(string), true
+	}
+	return "", false
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
@@ -35,7 +48,9 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 			})
 		}
 
-		return c.JSON(models.TokenResponse{Token: token})
+		h.StoreCredentials(loginReq.Username, loginReq.Password)
+		return c.JSON(models.TokenResponse{Token: token, User: loginReq.Username})
+
 	}
 
 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{

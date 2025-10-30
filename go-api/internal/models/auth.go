@@ -11,6 +11,7 @@ type LoginRequest struct {
 // TokenResponse represents the JWT token response
 type TokenResponse struct {
 	Token string `json:"token"`
+	User  string `json:"user"`
 }
 
 // Claims represents JWT claims

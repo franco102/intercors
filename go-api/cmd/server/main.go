@@ -4,41 +4,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/franco102/intercors/go-api/internal/handlers"
-	"github.com/franco102/intercors/go-api/internal/middlewares"
-	"github.com/franco102/intercors/go-api/internal/services"
+	"github.com/franco102/intercors/go-api/internal/config"
+	"github.com/franco102/intercors/go-api/internal/routes"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	// Initialize services
-	nodeAPIService := services.NewNodeAPIService()
-	matrixService := services.NewMatrixService(nodeAPIService)
-	authHandler := handlers.NewAuthHandler()
-	matrixHandler := handlers.NewMatrixHandler(matrixService)
-	healthHandler := handlers.NewHealthHandler()
+
+	config.LoadEnv()
 
 	app := fiber.New()
 
-	// Middleware
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders: "Content-Type,Authorization",
-	}))
-
-	// Routes
-	app.Get("/health", healthHandler.HealthCheck)
-	app.Post("/login", authHandler.Login)
-
-	// Protected routes
-	protected := app.Group("/api")
-	protected.Use(middlewares.JWTMiddleware)
-	{
-		protected.Post("/rotate", matrixHandler.RotateMatrix)
-	}
+	routes.RegisterRoutes(app)
 
 	port := os.Getenv("PORT")
 	if port == "" {

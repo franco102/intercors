@@ -16,7 +16,7 @@ func NewMatrixService(nodeAPIService *NodeAPIService) *MatrixService {
 	}
 }
 
-func (s *MatrixService) RotateMatrix(data [][]int) ([][]int, map[string]interface{}, error) {
+func (s *MatrixService) RotateMatrix(data [][]int, username, password string) ([][]int, map[string]interface{}, error) {
 	// Validate matrix
 	if !matrix.IsValid(data) {
 		return nil, nil, fmt.Errorf("invalid matrix: must be non-empty and rectangular")
@@ -29,7 +29,7 @@ func (s *MatrixService) RotateMatrix(data [][]int) ([][]int, map[string]interfac
 	rotatedMatrix := matrix.Rotate(data)
 
 	// Send to Node.js API for statistics
-	statistics, err := s.nodeAPIService.SendRotatedMatrix(rotatedMatrix, isOriginalDiagonal)
+	statistics, err := s.nodeAPIService.SendRotatedMatrix(rotatedMatrix, isOriginalDiagonal, username, password)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error sending to Node.js API: %v", err)
 	}

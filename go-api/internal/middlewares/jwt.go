@@ -1,13 +1,15 @@
 package middlewares
 
 import (
+	"os"
+
 	"github.com/franco102/intercors/go-api/internal/models"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-secret-key-change-in-production")
+var jwtSecret = []byte(os.Getenv("KEY_JWT"))
 
 func JWTMiddleware(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
