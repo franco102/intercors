@@ -1,5 +1,5 @@
-module matrix-rotation-api
-
+// module matrix-rotation-api
+module github.com/franco102/intercors/go-api
 go 1.21
 
 require (
