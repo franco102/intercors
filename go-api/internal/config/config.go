@@ -7,6 +7,7 @@ import (
 )
 
 func LoadEnv() {
+	// Look for .env in the current working directory
 	err := godotenv.Load("../../.env")
 	if err != nil {
 		log.Println("⚠️  No .env file found, using system environment variables")

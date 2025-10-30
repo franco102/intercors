@@ -17,6 +17,16 @@ func NewMatrixHandler(matrixService *services.MatrixService) *MatrixHandler {
 }
 
 func (h *MatrixHandler) RotateMatrix(c *fiber.Ctx) error {
+	// Get and validate the token from Authorization header
+	authHeader := c.Get("Authorization")
+	if authHeader == "" || len(authHeader) < 8 || authHeader[:7] != "Bearer " {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Missing or invalid Authorization header",
+		})
+	}
+	tokenString := authHeader[7:]
+
+	// Parse request body
 	var request struct {
 		Data [][]int `json:"data"`
 	}
@@ -26,20 +36,17 @@ func (h *MatrixHandler) RotateMatrix(c *fiber.Ctx) error {
 			"error": "Invalid JSON format",
 		})
 	}
-	authHeader := c.Get("Authorization")
-	tokenString := authHeader[7:]
-	return c.JSON(fiber.Map{
-		"tokenString": tokenString,
-	})
-	// rotatedMatrix, statistics, err := h.matrixService.RotateMatrix(request.Data, tokenString)
-	// if err != nil {
-	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	// 		"error": err.Error(),
-	// 	})
-	// }
 
-	// return c.JSON(fiber.Map{
-	// 	"rotatedMatrix": rotatedMatrix,
-	// 	"statistics":    statistics,
-	// })
+	// Process the matrix rotation with the token
+	rotatedMatrix, statistics, err := h.matrixService.RotateMatrix(request.Data, tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"rotatedMatrix": rotatedMatrix,
+		"statistics":    statistics,
+	})
 }
