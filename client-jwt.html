@@ -483,7 +483,7 @@
             const matrixDisplay = document.getElementById('rotatedMatrixDisplay');
             matrixDisplay.textContent = JSON.stringify(result.rotatedMatrix, null, 2);
 
-            const stats = result.statistics;
+            const stats = result.statistics.statistics;
             const statsTable = document.getElementById('statisticsTable');
             statsTable.innerHTML = `
                 <tr>

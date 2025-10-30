@@ -53,11 +53,45 @@ npm install
 npm start
 ```
 
+## 🔐 Autenticación
+
+### Obtener Token de Acceso
+
+**Endpoint:** `POST /login`
+
+**Request:**
+```json
+{
+  "username": "admin",
+  "password": "password"
+}
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Uso del Token
+
+Incluir el token en el header `Authorization` de las peticiones:
+```
+Authorization: Bearer <token>
+```
+
 ## Endpoints
 
 ### API Go
 
-#### POST /api/rotate
+#### POST /api/rotate (Protegido)
+**Requiere autenticación JWT**
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Body:**
 Recibe una matriz, la rota 90 grados y envía a la API Node.js para calcular estadísticas.
 
 **Request:**
