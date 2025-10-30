@@ -235,16 +235,38 @@ fetch('http://localhost:8080/api/rotate', {
 
 ```
 .
-├── go-api/
-│   ├── main.go              # Código principal de la API Go
-│   ├── go.mod               # Módulo de Go
-│   └── Dockerfile           # Dockerfile para Go
-├── node-api/
-│   ├── server.js            # Código principal de la API Node.js
-│   ├── package.json         # Dependencias de Node.js
-│   └── Dockerfile           # Dockerfile para Node.js
-├── docker-compose.yml       # Orquestación de servicios
-└── README.md                # Este archivo
+├── go-api/                  # API en Go
+│   ├── cmd/
+│   │   └── server/         # Punto de entrada de la aplicación
+│   │       ├── main.go
+│   │       └── main_test.go
+│   ├── internal/
+│   │   ├── config/         # Configuración de la aplicación
+│   │   ├── handlers/       # Manejadores de rutas HTTP
+│   │   ├── middlewares/    # Middlewares de autenticación/validación
+│   │   ├── models/         # Modelos de datos
+│   │   ├── routes/         # Definición de rutas
+│   │   ├── services/       # Lógica de negocio
+│   │   └── utils/          # Utilidades
+│   ├── pkg/
+│   │   └── matrix/         # Paquete para operaciones con matrices
+│   ├── go.mod              # Módulo de Go
+│   ├── go.sum
+│   └── Dockerfile          # Dockerfile para Go
+│
+├── node-api/               # API en Node.js
+│   ├── src/
+│   │   ├── controllers/    # Controladores de la API
+│   │   ├── middleware/     # Middlewares
+│   │   ├── services/       # Lógica de negocio
+│   │   └── utils/          # Utilidades
+│   ├── tests/              # Pruebas unitarias
+│   ├── package.json        # Dependencias de Node.js
+│   ├── package-lock.json
+│   └── Dockerfile          # Dockerfile para Node.js
+│
+├── docker-compose.yml      # Orquestación de servicios
+└── README.md               # Este archivo
 ```
 
 ## Consideraciones Técnicas
