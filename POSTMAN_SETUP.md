@@ -90,6 +90,79 @@ En lugar de escribir URLs completas, usa:
 - `{{go_url}}/api/rotate`
 - `{{node_url}}/api/statistics`
 
+## 🔐 Autenticación JWT con Keycloak
+
+### Configuración de Variables de Entorno
+
+1. Asegúrate de tener las siguientes variables en tu entorno de Postman:
+
+| Variable | Valor por defecto | Descripción |
+|----------|-------------------|-------------|
+| keycloak_url | http://localhost:8081 | URL del servidor Keycloak |
+| realm | intercors-realm | Nombre del realm |
+| client_id | intercors-client | ID del cliente configurado en Keycloak |
+| client_secret | [tu-client-secret] | Secreto del cliente (obtener de Keycloak) |
+| username | admin | Usuario de prueba |
+| password | [tu-contraseña] | Contraseña del usuario |
+
+### Obtener Token de Acceso
+
+1. Crea una nueva solicitud en Postman
+2. Método: `POST`
+3. URL: `{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token`
+4. Headers:
+   - `Content-Type: application/x-www-form-urlencoded`
+5. Body (x-www-form-urlencoded):
+   - `client_id`: `{{client_id}}`
+   - `client_secret`: `{{client_secret}}`
+   - `username`: `{{username}}`
+   - `password`: `{{password}}`
+   - `grant_type`: `password`
+
+### Usar el Token en las Solicitudes
+
+1. Después de obtener el token, crea una variable de entorno llamada `access_token`
+2. En las solicitudes que requieran autenticación, agrega el header:
+   - `Authorization`: `Bearer {{access_token}}`
+
+### Configuración de Pre-request Script
+
+Para automatizar la obtención del token, agrega este script en la pestaña "Pre-request Script" de tu colección:
+
+```javascript
+const tokenUrl = pm.environment.get('keycloak_url') + 
+    '/realms/' + pm.environment.get('realm') + 
+    '/protocol/openid-connect/token';
+
+const clientId = pm.environment.get('client_id');
+const clientSecret = pm.environment.get('client_secret');
+const username = pm.environment.get('username');
+const password = pm.environment.get('password');
+
+pm.sendRequest({
+    url: tokenUrl,
+    method: 'POST',
+    header: 'Content-Type: application/x-www-form-urlencoded',
+    body: {
+        mode: 'urlencoded',
+        urlencoded: [
+            { key: 'client_id', value: clientId },
+            { key: 'client_secret', value: clientSecret },
+            { key: 'username', value: username },
+            { key: 'password', value: password },
+            { key: 'grant_type', value: 'password' }
+        ]
+    }
+}, function (err, res) {
+    if (err) {
+        console.error(err);
+    } else {
+        const response = res.json();
+        pm.environment.set('access_token', response.access_token);
+    }
+});
+```
+
 ## Ejemplos de Pruebas
 
 ### Prueba 1: Verificar que ambas APIs están activas
