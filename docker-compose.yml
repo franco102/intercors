@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_API_URL=http://node-api:3000
+    depends_on:
+      - node-api
+    networks:
+      - matrix-network
+    container_name: go-api-service
+
+  node-api:
+    build:
+      context: ./node-api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    networks:
+      - matrix-network
+    container_name: node-api-service
+
+networks:
+  matrix-network:
+    driver: bridge

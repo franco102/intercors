@@ -1,0 +1,239 @@
+openapi: 3.0.0
+info:
+  title: Matrix Rotation and Statistics API
+  description: Sistema de rotación de matrices y cálculo de estadísticas
+  version: 1.0.0
+  contact:
+    name: Support
+    url: https://github.com
+
+servers:
+  - url: http://localhost:8080
+    description: Go API Server
+  - url: http://localhost:3000
+    description: Node.js API Server
+
+paths:
+  /api/rotate:
+    post:
+      summary: Rotate a matrix 90 degrees clockwise
+      description: Receives a matrix, rotates it 90 degrees, and sends it to Node.js API for statistics calculation
+      operationId: rotateMatrix
+      tags:
+        - Matrix Operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatrixInput'
+            examples:
+              simple3x3:
+                summary: Simple 3x3 matrix
+                value:
+                  data:
+                    - [1, 2, 3]
+                    - [4, 5, 6]
+                    - [7, 8, 9]
+              diagonal:
+                summary: Diagonal matrix
+                value:
+                  data:
+                    - [5, 0, 0]
+                    - [0, 5, 0]
+                    - [0, 0, 5]
+      responses:
+        '200':
+          description: Matrix rotated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RotationResponse'
+              examples:
+                success:
+                  summary: Successful rotation
+                  value:
+                    rotatedMatrix:
+                      - [7, 4, 1]
+                      - [8, 5, 2]
+                      - [9, 6, 3]
+                    statistics:
+                      maxValue: 9
+                      minValue: 1
+                      average: 5
+                      totalSum: 45
+                      isDiagonal: false
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                emptyMatrix:
+                  summary: Empty matrix error
+                  value:
+                    error: Matrix cannot be empty
+                invalidJson:
+                  summary: Invalid JSON error
+                  value:
+                    error: Invalid JSON
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/statistics:
+    post:
+      summary: Calculate statistics for a rotated matrix
+      description: Receives a rotated matrix and calculates statistics
+      operationId: calculateStatistics
+      tags:
+        - Statistics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatrixInput'
+      responses:
+        '200':
+          description: Statistics calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Verify if the API is running
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: Healthy response
+                  value:
+                    status: healthy
+
+components:
+  schemas:
+    MatrixInput:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          description: 2D array representing the matrix
+          items:
+            type: array
+            items:
+              type: integer
+          example:
+            - [1, 2, 3]
+            - [4, 5, 6]
+            - [7, 8, 9]
+
+    Statistics:
+      type: object
+      description: Calculated statistics for the matrix
+      properties:
+        maxValue:
+          type: integer
+          description: Maximum value in the matrix
+          example: 9
+        minValue:
+          type: integer
+          description: Minimum value in the matrix
+          example: 1
+        average:
+          type: number
+          description: Average of all values in the matrix
+          example: 5
+        totalSum:
+          type: integer
+          description: Sum of all values in the matrix
+          example: 45
+        isDiagonal:
+          type: boolean
+          description: Whether the matrix is diagonal
+          example: false
+
+    RotationResponse:
+      type: object
+      description: Response from rotation operation
+      properties:
+        rotatedMatrix:
+          type: array
+          description: The rotated matrix
+          items:
+            type: array
+            items:
+              type: integer
+        statistics:
+          $ref: '#/components/schemas/Statistics'
+
+    StatisticsResponse:
+      type: object
+      description: Response from statistics calculation
+      properties:
+        rotatedMatrix:
+          type: array
+          description: The input matrix
+          items:
+            type: array
+            items:
+              type: integer
+        statistics:
+          $ref: '#/components/schemas/Statistics'
+
+    Error:
+      type: object
+      description: Error response
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Invalid input
+
+    HealthResponse:
+      type: object
+      description: Health check response
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+          example: healthy
+
+tags:
+  - name: Matrix Operations
+    description: Operations related to matrix rotation
+  - name: Statistics
+    description: Operations related to statistics calculation
+  - name: Health
+    description: Health check endpoints

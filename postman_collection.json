@@ -1,0 +1,265 @@
+{
+  "info": {
+    "_postman_id": "matrix-rotation-api",
+    "name": "Matrix Rotation API",
+    "description": "Collection for testing Matrix Rotation and Statistics APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Go API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Node.js API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matrix Rotation",
+      "item": [
+        {
+          "name": "Simple 3x3 Matrix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Diagonal Matrix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [5, 0, 0],\n    [0, 5, 0],\n    [0, 0, 5]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Rectangular Matrix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [1, 2, 3, 4],\n    [5, 6, 7, 8]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Matrix with Negative Numbers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [-1, -2, -3],\n    [-4, -5, -6],\n    [-7, -8, -9]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Large Matrix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [1, 2, 3, 4, 5],\n    [6, 7, 8, 9, 10],\n    [11, 12, 13, 14, 15],\n    [16, 17, 18, 19, 20],\n    [21, 22, 23, 24, 25]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Statistics",
+      "item": [
+        {
+          "name": "Calculate Statistics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    [7, 4, 1],\n    [8, 5, 2],\n    [9, 6, 3]\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/statistics",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "statistics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Empty Matrix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": []\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Invalid JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ invalid json }"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        },
+        {
+          "name": "Missing Data Field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matrix\": [[1, 2], [3, 4]]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/rotate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "rotate"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+*.md
+.git
+.gitignore
+.env
+.env.local
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode
+.idea
+node_modules
+npm-debug.log
+yarn-error.log
