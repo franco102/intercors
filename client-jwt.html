@@ -464,27 +464,50 @@
                     body: JSON.stringify(data)
                 });
 
+                const result = await response.json();
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Error: ${response.statusText}`);
+                    // Si hay un error de autenticación, cierra la sesión
+                    if (response.status === 401) {
+                        logout();
+                    }
+                    throw new Error(result.error || `Error: ${response.statusText}`);
                 }
 
-                const result = await response.json();
                 displayResults(result);
                 showStatus('✓ Matriz rotada exitosamente', 'success');
 
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
-                console.error(error);
+                showStatus(`❌ ${error.message}`, 'error');
+                console.error('Error en rotateMatrix:', error);
+                // Limpiar resultados si hay un error
+                document.getElementById('rotatedMatrixDisplay').textContent = '';
+                document.getElementById('statisticsTable').innerHTML = '';
+                document.getElementById('resultsSection').style.display = 'none';
             }
         }
 
         function displayResults(result) {
             const matrixDisplay = document.getElementById('rotatedMatrixDisplay');
+            const statsTable = document.getElementById('statisticsTable');
+            
+            // Mostrar la matriz rotada
             matrixDisplay.textContent = JSON.stringify(result.rotatedMatrix, null, 2);
 
+            // Verificar si hay un error en las estadísticas
+            if (result.statistics && result.statistics.error) {
+                statsTable.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="color: #721c24; background-color: #f8d7da; padding: 10px; text-align: center;">
+                            ❌ ${result.statistics.error}
+                        </td>
+                    </tr>`;
+                document.getElementById('resultsSection').style.display = 'block';
+                return;
+            }
+
+            // Mostrar estadísticas si no hay error
             const stats = result.statistics.statistics;
-            const statsTable = document.getElementById('statisticsTable');
             statsTable.innerHTML = `
                 <tr>
                     <th>Métrica</th>
@@ -513,8 +536,7 @@
                             ${stats.isDiagonal ? 'Sí' : 'No'}
                         </span>
                     </td>
-                </tr>
-            `;
+                </tr>`;
 
             document.getElementById('resultsSection').style.display = 'block';
         }

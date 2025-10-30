@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -96,11 +97,17 @@ func RotateMatrix(matrix [][]int) [][]int {
 	return rotated
 }
 
-// SendToNodeAPI sends the rotated matrix to the Node.js API
+// SendToNodeAPI sends the rotated matrix to the Node.js API with JWT authentication
 func SendToNodeAPI(rotatedMatrix [][]int, originalDiagonal bool) (map[string]interface{}, error) {
 	nodeAPIURL := os.Getenv("NODE_API_URL")
 	if nodeAPIURL == "" {
 		nodeAPIURL = "http://localhost:3000"
+	}
+
+	// Obtener el token de autenticación del servicio Node.js
+	token, err := getNodeAPIToken()
+	if err != nil {
+		return nil, fmt.Errorf("error getting Node.js API token: %v", err)
 	}
 
 	payload := RotatedMatrix{
@@ -112,23 +119,113 @@ func SendToNodeAPI(rotatedMatrix [][]int, originalDiagonal bool) (map[string]int
 		return nil, fmt.Errorf("error marshaling JSON: %v", err)
 	}
 
-	resp, err := http.Post(
-		nodeAPIURL+"/api/statistics",
-		"application/json",
-		bytes.NewBuffer(jsonPayload),
-	)
+	// Crear una nueva solicitud HTTP
+	req, err := http.NewRequest("POST", nodeAPIURL+"/api/statistics", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %v", err)
+	}
+
+	// Agregar headers necesarios
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer " + token)
+
+	// Crear cliente HTTP y enviar la solicitud
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request to Node.js API: %v", err)
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	// Leer la respuesta
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %v", err)
+	}
+
+	// Verificar si hubo un error en la respuesta
+	if resp.StatusCode != http.StatusOK {
+		// Intentar decodificar el mensaje de error
+		var errorResp map[string]interface{}
+		if err := json.Unmarshal(body, &errorResp); err == nil {
+			if errorMsg, ok := errorResp["error"].(string); ok {
+				return nil, fmt.Errorf("Node.js API error: %s", errorMsg)
+			}
+		}
+		return nil, fmt.Errorf("Node.js API returned status %d: %s", resp.StatusCode, string(body))
+	}
+
+	// Decodificar la respuesta exitosa
+	var result map[string]interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("error decoding response: %v", err)
 	}
 
 	return result, nil
+}
+
+// getNodeAPIToken obtiene un token de autenticación para la API de Node.js
+func getNodeAPIToken() (string, error) {
+	// En un entorno de producción, esto debería venir de una variable de entorno o un servicio de gestión de secretos
+	// Por ahora usamos un valor fijo para pruebas
+	username := os.Getenv("NODE_API_USERNAME")
+	password := os.Getenv("NODE_API_PASSWORD")
+	
+	if username == "" {
+		username = "admin"
+	}
+	if password == "" {
+		password = "password"
+	}
+
+	// Crear payload para la autenticación
+	payload := map[string]string{
+		"username": username,
+		"password": password,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", fmt.Errorf("error marshaling login payload: %v", err)
+	}
+
+	// Get Node.js API URL from environment
+	nodeAPIURL := os.Getenv("NODE_API_URL")
+	if nodeAPIURL == "" {
+	nodeAPIURL = "http://localhost:3000"
+	}
+
+	// Make login request
+	resp, err := http.Post(nodeAPIURL+"/login", "application/json", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return "", fmt.Errorf("error during login request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Leer la respuesta
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("error reading login response: %v", err)
+	}
+
+	// Verificar si la autenticación fue exitosa
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("login failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	// Extraer el token de la respuesta
+	var tokenResp struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(body, &tokenResp); err != nil {
+		return "", fmt.Errorf("error parsing token response: %v", err)
+	}
+
+	if tokenResp.Token == "" {
+		return "", fmt.Errorf("empty token in response")
+	}
+
+	return tokenResp.Token, nil
 }
 
 // RotateHandler handles the POST request to rotate a matrix
