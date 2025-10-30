@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/franco102/intercors/go-api/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,13 +8,11 @@ import (
 
 type MatrixHandler struct {
 	matrixService *services.MatrixService
-	authHandler   *services.AuthHandler
 }
 
 func NewMatrixHandler(matrixService *services.MatrixService) *MatrixHandler {
 	return &MatrixHandler{
 		matrixService: matrixService,
-		authHandler:   services.GetAuthHandler(),
 	}
 }
 
@@ -30,23 +26,12 @@ func (h *MatrixHandler) RotateMatrix(c *fiber.Ctx) error {
 			"error": "Invalid JSON format",
 		})
 	}
-	// authHeader := c.Get("Authorization")
-	// tokenString := authHeader[7:]
-	username := c.Locals("username").(string)
-	password, found := h.authHandler.GetCredentials(username)
-	fmt.Println(password)
-	fmt.Println(username)
+	authHeader := c.Get("Authorization")
+	tokenString := authHeader[7:]
 	return c.JSON(fiber.Map{
-		"username": username,
-		"password": password,
+		"tokenString": tokenString,
 	})
-	// if !found {
-	// 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-	// 		"error": "Invalid credentials",
-	// 	})
-	// }
-	// fmt.Println(username, password)
-	// rotatedMatrix, statistics, err := h.matrixService.RotateMatrix(request.Data, username, password)
+	// rotatedMatrix, statistics, err := h.matrixService.RotateMatrix(request.Data, tokenString)
 	// if err != nil {
 	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 	// 		"error": err.Error(),
