@@ -2,14 +2,20 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 )
 
 func LoadEnv() {
-	// Look for .env in the current working directory
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Println("⚠️  No .env file found, using system environment variables")
+	// Cargar .env solo si el archivo realmente existe
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Load(); err != nil {
+			log.Println("⚠️  Error loading .env file:", err)
+		} else {
+			log.Println("✅  .env file loaded successfully")
+		}
+	} else {
+		log.Println("ℹ️  No .env file found (using environment variables from Docker or system)")
 	}
 }

@@ -15,6 +15,9 @@ services:
     networks:
       - matrix-network
     container_name: go-api-service
+    env_file:
+      - ./go-api/.env
+
 
   node-api:
     build:
@@ -27,6 +30,8 @@ services:
     networks:
       - matrix-network
     container_name: node-api-service
+    env_file:
+      - ./node-api/.env
 
 networks:
   matrix-network:
