@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/franco102/intercors/go-api/internal/handlers"
-	"github.com/franco102/intercors/go-api/internal/middleware"
+	"github.com/franco102/intercors/go-api/internal/middlewares"
 	"github.com/franco102/intercors/go-api/internal/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,7 +35,7 @@ func main() {
 
 	// Protected routes
 	protected := app.Group("/api")
-	protected.Use(middleware.JWTMiddleware)
+	protected.Use(middlewares.JWTMiddleware)
 	{
 		protected.Post("/rotate", matrixHandler.RotateMatrix)
 	}

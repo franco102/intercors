@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"github.com/franco102/intercors/go-api/internal/models"

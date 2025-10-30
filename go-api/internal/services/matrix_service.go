@@ -2,7 +2,8 @@ package services
 
 import (
 	"fmt"
-	"go-api/pkg/matrix"
+
+	"github.com/franco102/intercors/go-api/pkg/matrix"
 )
 
 type MatrixService struct {
