@@ -359,6 +359,22 @@ docker-compose down
 docker-compose down -v
 ```
 
+## Proyecto en Producción
+
+### URL de la API Go
+```bash
+http://159.89.143.206/go
+```
+
+### URL de la API Node.js
+```bash
+http://159.89.143.206/node
+```
+### URL para Probar la API Go
+```bash
+http://159.89.143.206
+```
+
 ## Notas
 
 - Las APIs están diseñadas para trabajar juntas pero también pueden usarse independientemente
